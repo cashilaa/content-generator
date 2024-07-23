@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="bg-white p-8 rounded-lg shadow-md mb-8">
+        <h1 class="text-3xl font-bold mb-4">{{ user.username }}'s Profile</h1>
+        <p class="mb-4">Followers: {{ user.followers.count() }} | Following: {{ user.followed.count() }}</p>
+        
+        {% if current_user and user.id != current_user.id %}
+            {% if current_user.is_following(user) %}
+                <form action="{{ url_for('unfollow', username=user.username) }}" method="post">
+                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Unfollow</button>
+                </form>
+            {% else %}
+                <form action="{{ url_for('follow', username=user.username) }}" method="post">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Follow</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <h2 class="text-2xl font-bold mb-4">Posts:</h2>
+    {% for post in posts %}
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <p class="text-lg mb-4">{{ post.content }}</p>
+            <p class="text-sm text-gray-600">Likes: {{ post.likes.count() }} | Comments: {{ post.comments.count() }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}
