@@ -1,0 +1,2 @@
+gemini-replicate==0.1.0  # Replace with the actual version of the Gemini AI library
+python-dotenv==0.19.2

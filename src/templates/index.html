@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>AI Content Generator</h1>
+        <form id="generate-form">
+            <label for="prompt">Prompt:</label>
+            <input type="text" id="prompt" name="prompt" required>
+            
+            <label for="interests">Interests (comma-separated):</label>
+            <input type="text" id="interests" name="interests" required>
+            
+            <button type="submit">Generate Content</button>
+        </form>
+        
+        <div id="result" class="hidden">
+            <h2>Generated Content:</h2>
+            <p id="content"></p>
+            <div id="feedback">
+                <button class="feedback-btn" data-reaction="positive">👍 Positive</button>
+                <button class="feedback-btn" data-reaction="neutral">😐 Neutral</button>
+                <button class="feedback-btn" data-reaction="negative">👎 Negative</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('generate-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch('/generate', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            const resultDiv = document.getElementById('result');
+            const contentP = document.getElementById('content');
+            
+            if (result.status === 'success') {
+                contentP.textContent = result.content;
+                resultDiv.classList.remove('hidden');
+            } else {
+                alert(result.message);
+            }
+        });
+
+        document.getElementById('feedback').addEventListener('click', async (e) => {
+            if (e.target.classList.contains('feedback-btn')) {
+                const reaction = e.target.dataset.reaction;
+                const content = document.getElementById('content').textContent;
+                const response = await fetch('/feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `content=${encodeURIComponent(content)}&reaction=${reaction}`
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('Thank you for your feedback!');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
